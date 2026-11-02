@@ -42,6 +42,34 @@ jobs:
           unzip -q NEXUS_CALC_Android_Project.zip -d source
           test -d source/NexusCalc
 
+      - name: Align Java and Kotlin JVM targets
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("source/NexusCalc/app/build.gradle.kts")
+          s = p.read_text()
+          marker = "    compileSdk = 35\n"
+
+          if marker not in s:
+              raise SystemExit("compileSdk line not found")
+
+          addition = """    compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+
+              kotlinOptions {
+                  jvmTarget = "17"
+              }
+
+          """
+
+          s = s.replace(marker, marker + addition, 1)
+          p.write_text(s)
+          print("Java e Kotlin configurados para JVM 17.")
+          PY
+
       - name: Build debug APK
         working-directory: source/NexusCalc
         run: gradle --no-daemon assembleDebug
