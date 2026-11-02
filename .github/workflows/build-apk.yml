@@ -41,10 +41,6 @@ jobs:
         run: |
           unzip -q NEXUS_CALC_Android_Project.zip -d source
           test -d source/NexusCalc
-
-      - name: Inspect Kotlin source
-        run: |
-          nl -ba source/NexusCalc/app/src/main/java/com/nexuscalc/app/MainActivity.kt | sed -n '45,110p'
           
       - name: Align Java and Kotlin JVM targets
         run: |
@@ -74,6 +70,7 @@ jobs:
           print("Java e Kotlin configurados para JVM 17.")
           PY
 
+      
       - name: Fix Kotlin source errors
         run: |
           python3 - <<'PY'
@@ -82,20 +79,25 @@ jobs:
           p = Path("source/NexusCalc/app/src/main/java/com/nexuscalc/app/MainActivity.kt")
           s = p.read_text()
 
-          s = s.replace(
-              "cornerRadius = dp(radius).toFloat()",
-              "cornerRadius = dp(radius.toInt()).toFloat()"
-          )
+          old1 = "cornerRadius = dp(radius).toFloat()"
+          new1 = "cornerRadius = dp(radius.toInt()).toFloat()"
+          old2 = "singleLine = false"
+          new2 = "setSingleLine(false)"
 
-          s = s.replace(
-              "singleLine = false",
-              "setSingleLine(false)"
-          )
+          if old1 in s:
+              s = s.replace(old1, new1, 1)
+          elif new1 not in s:
+              raise SystemExit("Não encontrei a expressão cornerRadius esperada.")
+
+          if old2 in s:
+              s = s.replace(old2, new2, 1)
+          elif new2 not in s:
+              raise SystemExit("Não encontrei a expressão singleLine esperada.")
 
           p.write_text(s)
-
-          print("Correções Kotlin aplicadas!")
+          print("As duas correções Kotlin foram verificadas!")
           PY
+          
           
       - name: Build debug APK
         working-directory: source/NexusCalc
