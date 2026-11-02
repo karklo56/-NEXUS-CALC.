@@ -42,6 +42,10 @@ jobs:
           unzip -q NEXUS_CALC_Android_Project.zip -d source
           test -d source/NexusCalc
 
+      - name: Inspect Kotlin source
+        run: |
+          nl -ba source/NexusCalc/app/src/main/java/com/nexuscalc/app/MainActivity.kt | sed -n '45,110p'
+          
       - name: Align Java and Kotlin JVM targets
         run: |
           python3 - <<'PY'
