@@ -41,7 +41,7 @@ jobs:
         run: |
           unzip -q NEXUS_CALC_Android_Project.zip -d source
           test -d source/NexusCalc
-          
+
       - name: Align Java and Kotlin JVM targets
         run: |
           python3 - <<'PY'
@@ -70,7 +70,6 @@ jobs:
           print("Java e Kotlin configurados para JVM 17.")
           PY
 
-      
       - name: Fix Kotlin source errors
         run: |
           python3 - <<'PY'
@@ -97,8 +96,39 @@ jobs:
           p.write_text(s)
           print("As duas correções Kotlin foram verificadas!")
           PY
-          
-          
+
+      - name: Activate immersive fullscreen
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("source/NexusCalc/app/src/main/java/com/nexuscalc/app/MainActivity.kt")
+          s = p.read_text()
+
+          marker = "super.onCreate(savedInstanceState)"
+          if marker not in s:
+              raise SystemExit("Não encontrei super.onCreate(savedInstanceState).")
+
+          fullscreen = """super.onCreate(savedInstanceState)
+
+                  window.decorView.systemUiVisibility = (
+                      android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                          or android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
+                          or android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                          or android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                          or android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                          or android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                  )"""
+
+          if "SYSTEM_UI_FLAG_IMMERSIVE_STICKY" in s:
+              print("Modo imersivo já estava configurado.")
+          else:
+              s = s.replace(marker, fullscreen, 1)
+              p.write_text(s)
+              print("Modo de tela cheia ativado!")
+
+          PY
+
       - name: Build debug APK
         working-directory: source/NexusCalc
         run: gradle --no-daemon assembleDebug
