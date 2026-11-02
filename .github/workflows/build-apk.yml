@@ -74,6 +74,29 @@ jobs:
           print("Java e Kotlin configurados para JVM 17.")
           PY
 
+      - name: Fix Kotlin source errors
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("source/NexusCalc/app/src/main/java/com/nexuscalc/app/MainActivity.kt")
+          s = p.read_text()
+
+          s = s.replace(
+              "cornerRadius = dp(radius).toFloat()",
+              "cornerRadius = dp(radius.toInt()).toFloat()"
+          )
+
+          s = s.replace(
+              "singleLine = false",
+              "setSingleLine(false)"
+          )
+
+          p.write_text(s)
+
+          print("Correções Kotlin aplicadas!")
+          PY
+          
       - name: Build debug APK
         working-directory: source/NexusCalc
         run: gradle --no-daemon assembleDebug
