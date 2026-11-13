@@ -128,16 +128,7 @@ jobs:
               print("Modo de tela cheia ativado!")
 
   
-      - name: Inspect NEXUS CALC layout
-        run: |
-          echo "========== MAIN ACTIVITY =========="
-          FILE="source/NexusCalc/app/src/main/java/com/nexuscalc/app/MainActivity.kt"
-          if [ ! -f "$FILE" ]; then
-            echo "MainActivity.kt não encontrado!"
-            exit 1
-          fi
-          wc -l "$FILE"
-          nl -ba "$FILE"
+      
         PY
 
       - name: Build debug APK
