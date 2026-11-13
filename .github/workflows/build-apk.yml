@@ -140,6 +140,43 @@ jobs:
           fi
           wc -l "$FILE"
           nl -ba "$FILE"
+
+      - name: Apply balanced layout
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("source/NexusCalc/app/src/main/java/com/nexuscalc/app/MainActivity.kt")
+          s = p.read_text()
+
+          changes = {
+              "setPadding(dp(20), dp(18), dp(20), dp(16))":
+                  "setPadding(dp(16), dp(10), dp(16), dp(10))",
+              "val scroll = ScrollView(this)":
+                  "val scroll = ScrollView(this).apply { isFillViewport = true }",
+              "addSpace(content, 22)": "addSpace(content, 14)",
+              "addSpace(content, 18)": "addSpace(content, 12)",
+              "addSpace(content, 16)": "addSpace(content, 11)",
+              "addSpace(content, 12)": "addSpace(content, 9)",
+              "addSpace(content, 9)": "addSpace(content, 8)",
+              "addSpace(content, 8)": "addSpace(content, 6)",
+              "LinearLayout.LayoutParams(-1, dp(52))":
+                  "LinearLayout.LayoutParams(-1, dp(56))",
+              "LinearLayout.LayoutParams(0, dp(48), 1f)":
+                  "LinearLayout.LayoutParams(0, dp(54), 1f)",
+              "lp.setMargins(dp(3), dp(3), dp(3), dp(3))":
+                  "lp.setMargins(dp(2), dp(2), dp(2), dp(2))"
+          }
+
+          original = s
+          for old, new in changes.items():
+              if old not in original:
+                  raise SystemExit("Trecho não encontrado: " + old)
+              s = s.replace(old, new)
+
+          p.write_text(s)
+          print("Layout equilibrado aplicado com sucesso!")
+          PY
           
       - name: Build debug APK
         working-directory: source/NexusCalc
