@@ -131,6 +131,17 @@ jobs:
       
         PY
 
+      - name: Inspect NEXUS CALC layout
+        run: |
+          echo "========== MAIN ACTIVITY =========="
+          FILE="source/NexusCalc/app/src/main/java/com/nexuscalc/app/MainActivity.kt"
+          if [ ! -f "$FILE" ]; then
+            echo "MainActivity.kt não encontrado!"
+            exit 1
+          fi
+          wc -l "$FILE"
+          nl -ba "$FILE"
+          
       - name: Build debug APK
         working-directory: source/NexusCalc
         run: gradle --no-daemon assembleDebug
