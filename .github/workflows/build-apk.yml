@@ -97,6 +97,7 @@ jobs:
           print("As duas correções Kotlin foram verificadas!")
           PY
 
+      
       - name: Activate immersive fullscreen
         run: |
           python3 - <<'PY'
@@ -126,10 +127,8 @@ jobs:
               s = s.replace(marker, fullscreen, 1)
               p.write_text(s)
               print("Modo de tela cheia ativado!")
-
-  
-      
-        PY
+          PY
+          
 
       - name: Inspect NEXUS CALC layout
         run: |
